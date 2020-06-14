@@ -11,3 +11,6 @@ start: FORCE
 	@mkdir -p log
 	@go build
 	@./grpcox
+
+bindata:
+	go-bindata -fs -pkg handler -prefix "index/" -o handler/site.go index/...

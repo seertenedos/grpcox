@@ -31,7 +31,11 @@ if you have golang installed on your local machine, just run command
 ```shell
 make start
 ```
-from grpcox directory
+Use 
+```shell
+make bindata
+```
+to embed `index` directory into grpcox executable.
 
 configure app preferences by editing `config.env` file
 
