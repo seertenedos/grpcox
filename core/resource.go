@@ -184,10 +184,10 @@ func (r *Resource) Describe(symbol string) (string, string, error) {
 }
 
 // Invoke - invoking gRPC function
-func (r *Resource) Invoke(ctx context.Context, symbol string, in io.Reader) (string, time.Duration, error) {
+func (r *Resource) Invoke(ctx context.Context, symbol string, in io.Reader) (string, string, time.Duration, error) {
 	err := r.openDescriptor()
 	if err != nil {
-		return "", 0, err
+		return "", "", 0, err
 	}
 	defer r.closeDescriptor()
 
@@ -200,25 +200,29 @@ func (r *Resource) Invoke(ctx context.Context, symbol string, in io.Reader) (str
 
 	f, w, err := os.Pipe()
 	if err != nil {
-		return "", 0, err
+		return "", "", 0, err
 	}
 	os.Stdout = w
 
 	rf, formatter, err := grpcurl.RequestParserAndFormatterFor(grpcurl.Format("json"), r.descSource, false, true, in)
 	if err != nil {
-		return "", 0, err
+		return "", "", 0, err
 	}
 	h := grpcurl.NewDefaultEventHandler(os.Stdout, r.descSource, formatter, false)
 
 	start := time.Now()
 	err = grpcurl.InvokeRPC(ctx, r.descSource, r.clientConn, symbol, r.headers, h, rf.Next)
-	end := time.Now().Sub(start) / time.Millisecond
+	end := time.Since(start) / time.Millisecond
 	if err != nil {
-		return "", end, err
+		return "", "", end, err
 	}
 
 	if h.Status.Code() != codes.OK {
-		return "", end, fmt.Errorf(h.Status.Message())
+		errResp, _ := formatter(h.Status.Proto())
+		// *status.Status
+		// buff := &bytes.Buffer{}
+		// grpcurl.PrintStatus(buff, h.Status, formatter)
+		return "", errResp, end, nil
 	}
 
 	// copy the output in a separate goroutine so printing can't block indefinitely
@@ -232,7 +236,7 @@ func (r *Resource) Invoke(ctx context.Context, symbol string, in io.Reader) (str
 	w.Close()
 	out := <-outC
 
-	return out, end, nil
+	return out, "", end, nil
 }
 
 // Close - to close all resources that was opened before

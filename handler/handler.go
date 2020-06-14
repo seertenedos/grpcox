@@ -222,20 +222,22 @@ func (h *Handler) invokeFunction(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// get param
-	result, timer, err := res.Invoke(context.Background(), funcName, r.Body)
+	result, errResult, timer, err := res.Invoke(context.Background(), funcName, r.Body)
 	if err != nil {
 		writeError(w, err)
 		return
 	}
 
 	type invRes struct {
-		Time   string `json:"timer"`
-		Result string `json:"result"`
+		Time      string `json:"timer"`
+		Result    string `json:"result"`
+		ErrResult string `json:"errorResult"`
 	}
 
 	h.g.Extend(host)
 	response(w, invRes{
-		Time:   timer.String(),
-		Result: result,
+		Time:      timer.String(),
+		Result:    result,
+		ErrResult: errResult,
 	})
 }

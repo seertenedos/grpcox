@@ -1,6 +1,143 @@
 var target, use_tls, editor;
 
+$(function() {
+    ace.config.set('basePath', 'https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.11/');
+
+    editor = generate_editor("editor", "json", false);
+
+    generate_editor($("#schema-proto")[0], "protobuf", true);
+    generate_editor($("#json-response")[0], "json", true);
+});
+
+$('#server-target').on('keypress',function(e) {
+    if(e.which == 13) {
+        reflect_service();
+    }
+});
+
 $('#get-services').click(function(){
+    reflect_service();
+});
+
+$('#select-service').change(function(){
+    var selected = $(this).val();
+    if (selected == "") {
+        return false;
+    }
+
+    $('#body-request').hide();
+    $('#response').hide();
+    $.ajax({
+        url: "server/"+target+"/service/"+selected+"/functions",
+        global: true,
+        method: "GET",
+        success: function(res){
+            if (res.error) {
+                alert(res.error);
+                return;
+            }
+            $("#select-function").html(new Option("Choose Method", ""));
+            $.each(res.data, (_, item) => $("#select-function").append(new Option(item.substr(selected.length) , item)));
+            $('#choose-function').show();
+        },
+        error: err,
+        beforeSend: function(xhr){
+            $('#choose-function').hide();
+            xhr.setRequestHeader('use_tls', use_tls);
+            show_loading();
+        },
+        complete: function(){
+            hide_loading();
+        }
+    });
+});
+
+$('#select-function').change(function(){
+    var selected = $(this).val();
+    if (selected == "") {
+        return false;
+    }
+
+    $('#response').hide();
+    $.ajax({
+        url: "server/"+target+"/function/"+selected+"/describe",
+        global: true,
+        method: "GET",
+        success: function(res){
+            if (res.error) {
+                alert(res.error);
+                return;
+            }
+
+            editor.setValue(res.data.template, 1);
+            
+            schemeViewer = ace.edit("schema-proto");
+            schemeViewer.setValue(res.data.schema, -1);
+            $('#body-request').show();
+        },
+        error: err,
+        beforeSend: function(xhr){
+            $('#body-request').hide();
+            xhr.setRequestHeader('use_tls', use_tls);
+            show_loading();
+        },
+        complete: function(){
+            hide_loading();
+        }
+    });
+});
+
+$('#invoke-func').click(function(){
+    var func = $('#select-function').val();
+    if (func == "") {
+        return false;
+    }
+    var body = editor.getValue();
+    var button = $(this).html();
+    $.ajax({
+        url: "server/"+target+"/function/"+func+"/invoke",
+        global: true,
+        method: "POST",
+        data: body,
+        dataType: "json",
+        success: function(res){
+            if (res.error) {
+                alert(res.error);
+                return;
+            }
+
+            fmtResult = formatJson(res.data.result || res.data.errorResult);
+            respViewer = ace.edit("json-response");
+            respViewer.setValue(fmtResult, -1);
+
+            if (res.data.errorResult) {
+                $('#response').addClass("response-error");
+                $("#response .card-title a").text("Error");
+            }
+            $("#timer-resp span").html(res.data.timer);
+            $('#response').show();
+        },
+        error: err,
+        beforeSend: function(xhr){
+            $('#response').hide();
+            $('#response').removeClass("response-error");
+            $("#response .card-title a").text("Response");
+            xhr.setRequestHeader('use_tls', use_tls);
+            $(this).html("Loading...");
+            show_loading();
+        },
+        complete: function(){
+            $(this).html(button);
+            hide_loading();
+        }
+    });
+});
+
+function formatJson(json) {
+    return JSON.stringify(JSON.parse(json), null, '  ');
+}
+
+function reflect_service() {
     var t = get_valid_target();
 
     use_tls = "false";
@@ -64,126 +201,26 @@ $('#get-services').click(function(){
     }
 
     $('.other-elem').hide();
-    var button = $(this).html();
+    var button = $("#get-services").html();
     $.ajax(ajaxProps);
-});
+}
 
-$('#select-service').change(function(){
-    var selected = $(this).val();
-    if (selected == "") {
-        return false;
-    }
-
-    $('#body-request').hide();
-    $('#response').hide();
-    $.ajax({
-        url: "server/"+target+"/service/"+selected+"/functions",
-        global: true,
-        method: "GET",
-        success: function(res){
-            if (res.error) {
-                alert(res.error);
-                return;
-            }
-            $("#select-function").html(new Option("Choose Method", ""));
-            $.each(res.data, (_, item) => $("#select-function").append(new Option(item.substr(selected.length) , item)));
-            $('#choose-function').show();
-        },
-        error: err,
-        beforeSend: function(xhr){
-            $('#choose-function').hide();
-            xhr.setRequestHeader('use_tls', use_tls);
-            show_loading();
-        },
-        complete: function(){
-            hide_loading();
-        }
+function generate_editor(target, syntax, readonly) {
+    e = ace.edit(target);
+    e.setOptions({
+        maxLines: Infinity,
+        fontFamily: 'SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace',
+        fontSize: "14px"
     });
-});
-
-$('#select-function').change(function(){
-    var selected = $(this).val();
-    if (selected == "") {
-        return false;
+    e.renderer.setScrollMargin(10, 10, 10, 10);
+    e.renderer.setShowGutter(false);
+    e.setTheme("ace/theme/textmate");
+    if (readonly) {
+        e.setReadOnly(true);
+        e.setHighlightActiveLine(false);
     }
-
-    $('#response').hide();
-    $.ajax({
-        url: "server/"+target+"/function/"+selected+"/describe",
-        global: true,
-        method: "GET",
-        success: function(res){
-            if (res.error) {
-                alert(res.error);
-                return;
-            }
-
-            generate_editor(res.data.template);
-            $("#schema-proto").html(PR.prettyPrintOne(res.data.schema));
-            $('#body-request').show();
-        },
-        error: err,
-        beforeSend: function(xhr){
-            $('#body-request').hide();
-            xhr.setRequestHeader('use_tls', use_tls);
-            show_loading();
-        },
-        complete: function(){
-            hide_loading();
-        }
-    });
-});
-
-$('#invoke-func').click(function(){
-    var func = $('#select-function').val();
-    if (func == "") {
-        return false;
-    }
-    var body = editor.getValue();
-    var button = $(this).html();
-    $.ajax({
-        url: "server/"+target+"/function/"+func+"/invoke",
-        global: true,
-        method: "POST",
-        data: body,
-        dataType: "json",
-        success: function(res){
-            if (res.error) {
-                alert(res.error);
-                return;
-            }
-            $("#json-response").html(PR.prettyPrintOne(res.data.result));
-            $("#timer-resp span").html(res.data.timer);
-            $('#response').show();
-        },
-        error: err,
-        beforeSend: function(xhr){
-            $('#response').hide();
-            xhr.setRequestHeader('use_tls', use_tls);
-            $(this).html("Loading...");
-            show_loading();
-        },
-        complete: function(){
-            $(this).html(button);
-            hide_loading();
-        }
-    });
-});
-
-function generate_editor(content) {
-    if(editor) {
-        editor.setValue(content);
-        return true;
-    }
-    $("#editor").html(content);
-    editor = ace.edit("editor");
-    editor.setOptions({
-        maxLines: Infinity
-    });
-    editor.renderer.setScrollMargin(10, 10, 10, 10);
-    editor.setTheme("ace/theme/github");
-    editor.session.setMode("ace/mode/json");
-    editor.renderer.setShowGutter(false);
+    e.session.setMode("ace/mode/" + syntax);
+    return e;
 }
 
 function get_valid_target() {
