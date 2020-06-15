@@ -38,7 +38,7 @@ func main() {
 		Handler:      muxRouter,
 	}
 
-	fmt.Println("Service started on", port)
+	fmt.Println("Service started on", "http://localhost"+port)
 	go func() {
 		log.Fatal(srv.ListenAndServe())
 	}()
