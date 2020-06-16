@@ -2,11 +2,13 @@ package main
 
 import (
 	"context"
+	"flag"
 	"fmt"
 	"log"
 	"net/http"
 	"os"
 	"os/signal"
+	"path/filepath"
 	"time"
 
 	"github.com/gorilla/mux"
@@ -14,14 +16,25 @@ import (
 	"github.com/gusaul/grpcox/handler"
 )
 
+var logFile = flag.String("logfile", "", "log file")
+
 func main() {
 	// logging conf
-	f, err := os.OpenFile("log/grpcox.log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
-	if err != nil {
-		log.Fatalf("error opening file: %v", err)
+	flag.Parse()
+	if logFile != nil && *logFile != "" {
+		err := os.MkdirAll(filepath.Dir(*logFile), os.ModeDir|os.ModePerm)
+		if err != nil {
+			log.Fatalf("error creating dir: %v", err)
+		}
+
+		f, err := os.OpenFile(*logFile, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
+		if err != nil {
+			log.Fatalf("error opening file: %v", err)
+		}
+		defer f.Close()
+		log.SetOutput(f)
 	}
-	defer f.Close()
-	log.SetOutput(f)
+
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
 
 	// start app
@@ -56,7 +69,7 @@ func main() {
 	ctx, cancel := context.WithTimeout(context.Background(), wait)
 	defer cancel()
 
-	err = removeProtos()
+	err := removeProtos()
 	if err != nil {
 		log.Printf("error while removing protos: %s", err.Error())
 	}

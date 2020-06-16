@@ -25,4 +25,4 @@ build_darwin:
 	GOOS=darwin GOARCH=amd64 go build -o ./build/darwin_amd64/grpcox
 
 build_windows:
-	GOOS=windows GOARCH=amd64 go build -o ./build/windows_amd64/grpcox 
+	GOOS=windows GOARCH=amd64 go build -o ./build/windows_amd64/grpcox.exe 
