@@ -10,8 +10,6 @@ import (
 func Init(router *mux.Router) {
 	h := InitHandler()
 
-	router.HandleFunc("/", h.index)
-
 	ajaxRoute := router.PathPrefix("/server/{host}").Subrouter()
 	ajaxRoute.HandleFunc("/services", corsHandler(h.getLists)).Methods(http.MethodGet, http.MethodOptions)
 	ajaxRoute.HandleFunc("/services", corsHandler(h.getListsWithProto)).Methods(http.MethodPost)
