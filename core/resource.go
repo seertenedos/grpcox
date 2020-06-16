@@ -204,7 +204,7 @@ func (r *Resource) Invoke(ctx context.Context, symbol string, in io.Reader) (str
 	}
 	os.Stdout = w
 
-	rf, formatter, err := grpcurl.RequestParserAndFormatterFor(grpcurl.Format("json"), r.descSource, false, true, in)
+	rf, formatter, err := grpcurl.RequestParserAndFormatterFor(grpcurl.Format("json"), r.descSource, true, true, in)
 	if err != nil {
 		return "", "", 0, err
 	}
