@@ -222,7 +222,7 @@ func (h *Handler) invokeFunction(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// get param
-	result, timer, err := res.Invoke(context.Background(), funcName, r.Body)
+	result, timer, err := res.Invoke(context.Background(), funcName, r.Body, r.Header.Get("Authorization"))
 	if err != nil {
 		writeError(w, err)
 		return

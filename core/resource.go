@@ -184,7 +184,7 @@ func (r *Resource) Describe(symbol string) (string, string, error) {
 }
 
 // Invoke - invoking gRPC function
-func (r *Resource) Invoke(ctx context.Context, symbol string, in io.Reader) (string, time.Duration, error) {
+func (r *Resource) Invoke(ctx context.Context, symbol string, in io.Reader, token string) (string, time.Duration, error) {
 	err := r.openDescriptor()
 	if err != nil {
 		return "", 0, err
@@ -211,7 +211,8 @@ func (r *Resource) Invoke(ctx context.Context, symbol string, in io.Reader) (str
 	h := grpcurl.NewDefaultEventHandler(os.Stdout, r.descSource, formatter, false)
 
 	start := time.Now()
-	err = grpcurl.InvokeRPC(ctx, r.descSource, r.clientConn, symbol, r.headers, h, rf.Next)
+	var headers = []string{"authorization:" + token}
+	err = grpcurl.InvokeRPC(ctx, r.descSource, r.clientConn, symbol, headers, h, rf.Next)
 	end := time.Now().Sub(start) / time.Millisecond
 	if err != nil {
 		return "", end, err

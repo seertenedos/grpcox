@@ -88,6 +88,7 @@ $('#select-service').change(function(){
             $("#select-function").html(new Option("Choose Method", ""));
             $.each(res.data, (_, item) => $("#select-function").append(new Option(item.substr(selected.length) , item)));
             $('#choose-function').show();
+            $('#server-token-row').show();
         },
         error: err,
         beforeSend: function(xhr){
@@ -140,9 +141,16 @@ $('#invoke-func').click(function(){
         return false;
     }
     var body = editor.getValue();
+    var token = $('#server-token').val() || "Bearer none";
+    if (token.indexOf("Bearer ") !== 0) {
+        token = "Bearer " + token;
+    }
     var button = $(this).html();
     $.ajax({
         url: "server/"+target+"/function/"+func+"/invoke",
+        headers: {
+            'authorization': token
+        },
         global: true,
         method: "POST",
         data: body,
