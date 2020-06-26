@@ -14,6 +14,6 @@ FROM alpine
 RUN mkdir log && touch log/grpcox.log
 COPY ./index /index
 COPY --from=builder /src/grpcox ./
-RUN mkdir /log
+RUN mkdir -p /log
 EXPOSE 6969
 ENTRYPOINT ["./grpcox"]
