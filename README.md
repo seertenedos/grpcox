@@ -1,5 +1,6 @@
 # gRPCox
-[![Go Report Card](https://goreportcard.com/badge/github.com/gusaul/grpcox)](https://goreportcard.com/report/github.com/gusaul/grpcox)
+[![Go Report Card](https://goreportcard.com/badge/github.com/hummerd/grpcox)](https://goreportcard.com/report/github.com/hummerd/grpcox)
+![Go](https://github.com/hummerd/grpcox/workflows/Go/badge.svg)
 
 turn [gRPCurl](https://github.com/fullstorydev/grpcurl) into web based UI, extremely easy to use
 
