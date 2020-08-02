@@ -84,7 +84,7 @@
           </div>
         </div>
 
-        <div class="row other-elem" id="response" style="display: none">
+        <div class="row other-elem mb-3" id="response" style="display: none">
           <div class="col">
             <div class="card">
               <div class="card-body">
@@ -97,11 +97,31 @@
             </div>
           </div>
         </div>
+
+        <div class="row other-elem mb-3" id="decode-block" style="display: none">
+          <div class="col">
+            <div class="card">
+              <div class="card-body">
+                <h4 class="card-title"><a>Decode:</a></h4>
+                <div class="md-form input-group">
+                  <input id="decode-data" placeholder="Enter base64 encoded json" type="text" class="form-control" aria-describedby="decode" >
+                  <div class="input-group-append">
+                    <button class="btn btn-md btn-secondary m-0 px-3" type="button" id="decode">Decode</button>
+                  </div>
+                </div>
+                <p class="card-text">
+                  <pre id="json-decoded"></pre>
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
       </div>
     </div>
   </div>
 
-  <a target="_blank" href="https://github.com/gusaul/grpcox" class="github-corner" aria-label="View source on GitHub">
+  <a target="_blank" href="https://github.com/hummerd/grpcox" class="github-corner" aria-label="View source on GitHub">
     <svg width="80" height="80" viewBox="0 0 250 250" style="fill:#151513; color:#fff; position: absolute; top: 0; border: 0; right: 0;"
       aria-hidden="true">
       <path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path>

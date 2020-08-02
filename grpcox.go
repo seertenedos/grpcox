@@ -52,7 +52,7 @@ func main() {
 		Handler:      muxRouter,
 	}
 
-	fmt.Println("Service started on", "http://localhost"+strconv.Itoa(*port))
+	fmt.Println("Service started on", "http://localhost:"+strconv.Itoa(*port))
 	go func() {
 		log.Fatal(srv.ListenAndServe())
 	}()

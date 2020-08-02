@@ -7,6 +7,7 @@ $(function() {
 
     generate_editor($("#schema-proto")[0], "protobuf", true);
     generate_editor($("#json-response")[0], "json", true);
+    generate_editor($("#json-decoded")[0], "json", true);
 });
 
 $('#server-target').on('keypress',function(e) {
@@ -87,6 +88,15 @@ $('#select-function').change(function(){
     });
 });
 
+$('#decode').click(function(){
+    data = $('#decode-data').val();
+    decodedData = window.atob(data);
+
+    fmtDecodedData = formatJson(decodedData);
+    decodeViewer = ace.edit("json-decoded");
+    decodeViewer.setValue(fmtDecodedData, -1);
+});
+
 $('#invoke-func').click(function(){
     var func = $('#select-function').val();
     if (func == "") {
@@ -115,11 +125,11 @@ $('#invoke-func').click(function(){
                 $("#response .card-title a").text("Error");
             }
             $("#timer-resp span").html(res.data.timer);
-            $('#response').show();
+            $('#response, #decode-block').show();
         },
         error: err,
         beforeSend: function(xhr){
-            $('#response').hide();
+            $('#response, #decode-block').hide();
             $('#response').removeClass("response-error");
             $("#response .card-title a").text("Response");
             xhr.setRequestHeader('use_tls', use_tls);

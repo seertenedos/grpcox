@@ -6,7 +6,7 @@ FORCE:
 include config.env
 export $(shell sed 's/=.*//' config.env)
 
-start: FORCE
+start: FORCE build
 	@echo " >> building..."
 	@mkdir -p log
 	@go build
@@ -15,6 +15,9 @@ start: FORCE
 bindata:
 	go-bindata -fs -pkg handler -prefix "index/" -o handler/site.go index/...
 
+
+build: bindata
+	go build
 
 build_all: build_linux build_darwin build_windows
 
