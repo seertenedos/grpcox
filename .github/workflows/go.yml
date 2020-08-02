@@ -8,7 +8,7 @@ on:
 
 jobs:
 
-  build-linux:
+  build:
     name: Build Linux
     runs-on: ${{ matrix.os }}
     strategy:
@@ -30,7 +30,15 @@ jobs:
         go mod vendor
 
     - name: Build
-      run: go build -v .
+      run: go build -v -o ./bin/grpcox .
 
     - name: Test
       run: go test -v .
+
+    - name: Upload bin
+      uses: actions/upload-artifact@v2
+      env:
+        GOOS: $(go env GOOS)
+      with:
+        name: grpcox-${{ env.GOOS }}
+        path: ./bin
