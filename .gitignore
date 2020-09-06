@@ -1,3 +1,5 @@
 grpcox
 log
+build
+vendor
 *.out

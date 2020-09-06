@@ -10,8 +10,6 @@ import (
 func Init(router *mux.Router) {
 	h := InitHandler()
 
-	router.HandleFunc("/", h.index)
-
 	ajaxRoute := router.PathPrefix("/server/{host}").Subrouter()
 	ajaxRoute.HandleFunc("/services", corsHandler(h.getLists)).Methods(http.MethodGet, http.MethodOptions)
 	ajaxRoute.HandleFunc("/services", corsHandler(h.getListsWithProto)).Methods(http.MethodPost)
@@ -24,11 +22,7 @@ func Init(router *mux.Router) {
 	// close active connection
 	router.HandleFunc("/active/close/{host}", corsHandler(h.closeActiveConns)).Methods(http.MethodDelete, http.MethodOptions)
 
-	assetsPath := "index"
-	router.PathPrefix("/css/").Handler(http.StripPrefix("/css/", http.FileServer(http.Dir(assetsPath+"/css/"))))
-	router.PathPrefix("/js/").Handler(http.StripPrefix("/js/", http.FileServer(http.Dir(assetsPath+"/js/"))))
-	router.PathPrefix("/font/").Handler(http.StripPrefix("/font/", http.FileServer(http.Dir(assetsPath+"/font/"))))
-	router.PathPrefix("/img/").Handler(http.StripPrefix("/img/", http.FileServer(http.Dir(assetsPath+"/img/"))))
+	router.PathPrefix("/").Handler(http.FileServer(AssetFile()))
 }
 
 func corsHandler(h http.HandlerFunc) http.HandlerFunc {

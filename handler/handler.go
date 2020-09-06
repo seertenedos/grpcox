@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"bytes"
 	"context"
 	"fmt"
 	"io/ioutil"
@@ -23,18 +22,6 @@ func InitHandler() *Handler {
 	return &Handler{
 		g: core.InitGrpCox(),
 	}
-}
-
-func (h *Handler) index(w http.ResponseWriter, r *http.Request) {
-	body := new(bytes.Buffer)
-	err := indexHTML.Execute(body, make(map[string]string))
-	if err != nil {
-		writeError(w, err)
-		return
-	}
-	w.WriteHeader(http.StatusOK)
-	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	w.Write(body.Bytes())
 }
 
 func (h *Handler) getActiveConns(w http.ResponseWriter, r *http.Request) {
@@ -222,20 +209,22 @@ func (h *Handler) invokeFunction(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// get param
-	result, timer, err := res.Invoke(context.Background(), funcName, r.Body)
+	result, errResult, timer, err := res.Invoke(context.Background(), funcName, r.Body)
 	if err != nil {
 		writeError(w, err)
 		return
 	}
 
 	type invRes struct {
-		Time   string `json:"timer"`
-		Result string `json:"result"`
+		Time      string `json:"timer"`
+		Result    string `json:"result"`
+		ErrResult string `json:"errorResult"`
 	}
 
 	h.g.Extend(host)
 	response(w, invRes{
-		Time:   timer.String(),
-		Result: result,
+		Time:      timer.String(),
+		Result:    result,
+		ErrResult: errResult,
 	})
 }

@@ -84,24 +84,44 @@
           </div>
         </div>
 
-        <div class="row other-elem" id="response" style="display: none">
+        <div class="row other-elem mb-3" id="response" style="display: none">
           <div class="col">
             <div class="card">
               <div class="card-body">
                 <small class="pull-right" id="timer-resp">Time : <span></span></small>
                 <h4 class="card-title"><a>Response:</a></h4>
                 <p class="card-text">
-                  <pre class="prettyprint custom-pretty" id="json-response"></pre>
+                  <pre id="json-response"></pre>
                 </p>
               </div>
             </div>
           </div>
         </div>
+
+        <div class="row other-elem mb-3" id="decode-block" style="display: none">
+          <div class="col">
+            <div class="card">
+              <div class="card-body">
+                <h4 class="card-title"><a>Decode</a></h4>
+                <div class="md-form input-group">
+                  <input id="decode-data" placeholder="Enter base64 encoded json" type="text" class="form-control" aria-describedby="decode" >
+                  <div class="input-group-append">
+                    <button class="btn btn-md btn-secondary m-0 px-3" type="button" id="decode">Decode</button>
+                  </div>
+                </div>
+                <p class="card-text">
+                  <pre id="json-decoded"></pre>
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
       </div>
     </div>
   </div>
 
-  <a target="_blank" href="https://github.com/gusaul/grpcox" class="github-corner" aria-label="View source on GitHub">
+  <a target="_blank" href="https://github.com/hummerd/grpcox" class="github-corner" aria-label="View source on GitHub">
     <svg width="80" height="80" viewBox="0 0 250 250" style="fill:#151513; color:#fff; position: absolute; top: 0; border: 0; right: 0;"
       aria-hidden="true">
       <path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path>
@@ -134,8 +154,7 @@
   <script type="text/javascript" src="js/popper.min.js"></script>
   <script type="text/javascript" src="js/bootstrap.min.js"></script>
   <script type="text/javascript" src="js/mdb.min.js"></script>
-  <script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.1/ace.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.11/ace.min.js" integrity="sha256-qCCcAHv/Z0u7K344shsZKUF2NR+59ooA3XWRj0LPGIQ=" crossorigin="anonymous"></script>
   <script type="text/javascript" src="js/style.js"></script>
   <script type="text/javascript" src="js/proto.js"></script>
 </body>

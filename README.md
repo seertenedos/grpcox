@@ -1,5 +1,6 @@
 # gRPCox
-[![Go Report Card](https://goreportcard.com/badge/github.com/gusaul/grpcox)](https://goreportcard.com/report/github.com/gusaul/grpcox)
+[![Go Report Card](https://goreportcard.com/badge/github.com/hummerd/grpcox)](https://goreportcard.com/report/github.com/hummerd/grpcox)
+![Go](https://github.com/hummerd/grpcox/workflows/Go/badge.svg)
 
 turn [gRPCurl](https://github.com/fullstorydev/grpcurl) into web based UI, extremely easy to use
 
@@ -31,7 +32,11 @@ if you have golang installed on your local machine, just run command
 ```shell
 make start
 ```
-from grpcox directory
+Use 
+```shell
+make bindata
+```
+to embed `index` directory into grpcox executable.
 
 configure app preferences by editing `config.env` file
 
